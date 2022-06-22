@@ -19,6 +19,13 @@ type Route struct {
 	Position []Position
 }
 
+type PartialRoutePostion struct {
+	Id       string
+	ClientId string
+	Position []float64
+	Finished bool
+}
+
 func (route *Route) LoadPositions() error {
 	if route.Id == "" {
 		return errors.New("route id not informed")
