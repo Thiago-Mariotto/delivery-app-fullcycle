@@ -2,6 +2,7 @@ package route
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"os"
 	"strconv"
@@ -20,13 +21,13 @@ type Route struct {
 }
 
 type PartialRoutePostion struct {
-	Id       string
-	ClientId string
-	Position []float64
-	Finished bool
+	Id       string    `json:"routeId"`
+	ClientId string    `json:"ClientId"`
+	Position []float64 `json:"position"`
+	Finished bool      `json:"finished"`
 }
 
-func (route *Route) LoadPositions() error {
+func (r *Route) LoadPositions() error {
 	if route.Id == "" {
 		return errors.New("route id not informed")
 	}
@@ -58,4 +59,30 @@ func (route *Route) LoadPositions() error {
 	}
 
 	return nil
+}
+
+func (r *Route) ExportJsonPosition() ([]string, error) {
+	var route PartialRoutePostion
+	var result []string
+	total := len(r.Position)
+
+	for k, v := range r.Position {
+		route.Id = r.Id
+		route.ClientId = r.ClientId
+		route.Position = []float64{v.Lat, v.Long}
+		route.Finished = false
+
+		if total-1 == k {
+			route.Finished = true
+		}
+
+		jsonRoute, err := json.Marshal(route)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, string(jsonRoute)) // parse slice de byte para string
+	}
+
+	return result, nil
 }
