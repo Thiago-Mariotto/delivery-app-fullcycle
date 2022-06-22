@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -26,4 +27,13 @@ func (k *KafkaConsumer) Consume() {
 
 	topics := []string{os.Getenv("KafkaReadTopic")}
 	c.SubscribeTopics(topics, nil)
+
+	fmt.Println("Kafka consumer has been started")
+
+	for {
+		msg, err := c.ReadMessage(-1)
+		if err == nil {
+			k.MsgChannel <- msg
+		}
+	}
 }
